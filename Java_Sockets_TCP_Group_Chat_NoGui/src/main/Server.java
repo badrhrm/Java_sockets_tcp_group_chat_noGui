@@ -2,47 +2,35 @@ package main;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class Server {
-	ServerSocket serverSocket;
-	Socket socket;
-	BufferedReader bufferedReader;
-	BufferedWriter bufferedWriter;
+	private ServerSocket serverSocket;
+	static ArrayList<ClientConnectionHandler> clientsConnections = new ArrayList();
 	
+	
+	public void handleEachConnection() {
+		while (true) {
+			try {
+	            System.out.println("Waiting for a client to connect...");
+	            Socket clientSocket = this.serverSocket.accept();
+	            System.out.println("Client connected!");
+	            new Thread(new ClientConnectionHandler(clientSocket)).start();
+			} catch (IOException e) {
+                e.printStackTrace();
+            }    
+		}
+	}
 	public void run() {
 		try {
-			serverSocket = new ServerSocket(7777);
+			this.serverSocket = new ServerSocket(7777);
 			System.out.println("Chat server started...");
-			
-			while (true) {
-				try {
-		            System.out.println("Waiting for a client to connect...");
-		            socket = serverSocket.accept();
-		            if(socket != null) {
-		            	System.out.println("Client connected!");
-		            }
-		            
-		            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		            bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-		            
-		           
-		            
-		            while (true) {
-		            	String receivedMsg = bufferedReader.readLine();
-		            	if(receivedMsg != null) {
-		            		System.out.println("Client: " + receivedMsg);
-		            	}
-		            }
-		            
-				} catch (IOException e) {
-	                e.printStackTrace();
-	            }    
-			}
-			 
+			handleEachConnection();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
 	
     public static void main(String[] args) {
     	Server server = new Server();

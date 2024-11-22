@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class Client implements Runnable {
 	Socket socket;
 	BufferedReader bufferedReader;
 	BufferedWriter bufferedWriter;
@@ -28,10 +28,16 @@ public class Client {
 			}
 			bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            
+            bufferedWriter.write(this.userName);
+			bufferedWriter.newLine();
+			bufferedWriter.flush();
+            
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
 	public void sendMessages() {
 		while(true) {
 			
@@ -40,16 +46,43 @@ public class Client {
 				bufferedWriter.write(msg);
 				bufferedWriter.newLine();
 				bufferedWriter.flush();
+				
+				if (msg.equalsIgnoreCase("quit")) {
+					socket.close();
+					bufferedReader.close();
+					bufferedWriter.close();
+					scanner.close();
+					break;
+				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
 	}
+	
+	public void listeningToMessagesComingFromChatRoom() {
+		while(!socket.isClosed()) {
+			try {
+				String receivedMsg = bufferedReader.readLine();
+				if (receivedMsg != null) {
+					System.out.println(receivedMsg);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public void run() {
+		listeningToMessagesComingFromChatRoom();
+	}
+	
 	public static void main(String[] args) {
     	Client client = new Client();
     	client.connectToChatRoom();
     	client.sendMessages();
+    	new Thread(new Client()).start();
     }
 }
