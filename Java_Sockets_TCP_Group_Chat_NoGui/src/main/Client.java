@@ -82,7 +82,8 @@ public class Client implements Runnable {
 	public static void main(String[] args) {
     	Client client = new Client();
     	client.connectToChatRoom();
+    	new Thread(client).start();
     	client.sendMessages();
-    	new Thread(new Client()).start();
+    	
     }
 }

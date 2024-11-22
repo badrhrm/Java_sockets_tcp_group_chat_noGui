@@ -24,8 +24,6 @@ public class ClientConnectionHandler implements Runnable{
 		for(ClientConnectionHandler clientConHandler : Server.clientsConnections) {
 			try {
 				BufferedWriter clientSocketWriter = clientConHandler.bufferedWriter;
-				// debug 
-				System.out.println("Broadcasting to: " + clientConHandler.clientUserName + " message: " + msg);
 				clientSocketWriter.write(msg);
 				clientSocketWriter.newLine();
 				clientSocketWriter.flush();
@@ -52,7 +50,7 @@ public class ClientConnectionHandler implements Runnable{
 		broadcastMessageInChatRoom("# Sever: "+ this.clientUserName + " joined the chat room!");
 			
 		// debug
-		System.out.println("Clients in the chat:");
+		System.out.println("Debug : Clients in the chat:");
 		for (ClientConnectionHandler clientsConn : Server.clientsConnections) {
 			System.out.println(clientsConn.clientUserName);
 		}
@@ -72,7 +70,7 @@ public class ClientConnectionHandler implements Runnable{
 					Server.clientsConnections.remove(this);
 					
 					// debug
-					System.out.println("Clients still in the chat:");
+					System.out.println("Debug : Clients still in the chat:");
 					for(ClientConnectionHandler clientsConn : Server.clientsConnections) {
 						System.out.println(clientsConn.clientUserName);
 					}
